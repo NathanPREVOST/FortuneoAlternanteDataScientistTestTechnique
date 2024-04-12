@@ -1,17 +1,33 @@
 import streamlit as st
 import numpy as np
 from joblib import load
+import pandas as pd
 
 # Chargement du modèle
 model = load('modele_assurance_auto.joblib')
 
 def prepare_input(age, gender, driving_license, region_code, previously_insured, vehicle_age, vehicle_damage, annual_premium, policy_sales_channel, vintage):
-    # Encodage des variables catégorielles
-    gender_encoded = 0 if gender == 'Male' else 1
-    vehicle_age_encoded = {'< 1 Year': 0, '1-2 Year': 1, '> 2 Years': 2}[vehicle_age]
-    vehicle_damage_encoded = 0 if vehicle_damage == 'No' else 1
-    model_input = np.array([age, gender_encoded, driving_license, region_code, previously_insured, vehicle_age_encoded, vehicle_damage_encoded, annual_premium, policy_sales_channel, vintage]).reshape(1, -1)
-    return model_input
+    # Création d'un dictionnaire pour les données d'entrée
+    data = {
+        'Age': [age],
+        'Gender': [gender],
+        'Driving_License': [driving_license],
+        'Region_Code': [region_code],
+        'Previously_Insured': [previously_insured],
+        'Vehicle_Age': [vehicle_age],
+        'Vehicle_Damage': [vehicle_damage],
+        'Annual_Premium': [annual_premium],
+        'Policy_Sales_Channel': [policy_sales_channel],
+        'Vintage': [vintage]
+    }
+    
+    # Conversion en DataFrame
+    user_input = pd.DataFrame(data)
+    
+    # Assurez-vous que l'ordre des colonnes correspond à l'ordre attendu par votre modèle
+    # user_input = user_input[['Age', 'Gender', ... et ainsi de suite pour toutes les colonnes nécessaires]]
+    
+    return user_input
 
 def predict_interest(model, user_input):
     prediction = model.predict(user_input)
